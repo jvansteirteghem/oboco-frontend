@@ -1,0 +1,17 @@
+image: node:14.4.0-alpine3.12
+
+before_script:
+  - npm install -g @angular/cli
+  - npm install
+
+stages:
+  - build
+
+cache:
+  paths:
+    - node_modules
+
+build:
+  stage: build
+  script:
+    - ng build --prod
