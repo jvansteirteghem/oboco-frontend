@@ -63,3 +63,7 @@ you can use the latest docker image:
 	- docker login registry.gitlab.com -u jeeto -p <token>
 	- docker build -f Dockerfile -t registry.gitlab.com/jeeto/oboco-frontend/oboco-frontend:latest .
 	- docker push registry.gitlab.com/jeeto/oboco-frontend/oboco-frontend:latest
+
+## license
+
+- mit license
