@@ -66,4 +66,4 @@ you can use the latest docker image:
 
 ## license
 
-- mit license
+mit license
