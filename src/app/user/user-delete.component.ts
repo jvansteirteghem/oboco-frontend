@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { User } from './user';
 import { UserService } from './user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BookCollection } from '../book-collection/book-collection';
 
 @Component({
   selector: 'app-user-delete',
@@ -17,6 +18,7 @@ export class UserDeleteComponent implements OnInit {
   userForm_submitted = false;
   userForm_loading = false;
   user: User;
+  rootBookCollections: BookCollection[];
 
   constructor(private formBuilder: FormBuilder, private userService: UserService, private route: ActivatedRoute, private router: Router) { }
 
@@ -29,24 +31,33 @@ export class UserDeleteComponent implements OnInit {
       name: {value: '', disabled: true},
       password: {value: '', disabled: true},
       roleAdministrator: {value: '', disabled: true},
-      roleUser: {value: '', disabled: true}
+      roleUser: {value: '', disabled: true},
+      rootBookCollection: {value: '', disabled: true}
     });
 
     let id = +this.route.snapshot.queryParamMap.get('id');
 
-    this.userService.getUser(id)
-    .subscribe(user => {
+    forkJoin(
+      this.userService.getRootBookCollectionList(),
+      this.userService.getUser(id)
+    )
+    .subscribe(([rootBookCollectionList, user]) => {
+      this.rootBookCollections = rootBookCollectionList;
       this.user = user;
 
-      this.userForm.controls.name.setValue(this.user.name);
+        this.userForm.controls.name.setValue(this.user.name);
 
-      if(this.user.roles.includes("ADMINISTRATOR")) {
-        this.userForm.controls.roleAdministrator.setValue(true);
-      }
+        if(this.user.roles.includes("ADMINISTRATOR")) {
+          this.userForm.controls.roleAdministrator.setValue(true);
+        }
 
-      if(this.user.roles.includes("USER")) {
-        this.userForm.controls.roleUser.setValue(true);
-      }
+        if(this.user.roles.includes("USER")) {
+          this.userForm.controls.roleUser.setValue(true);
+        }
+
+        if(this.user.rootBookCollection) {
+          this.userForm.controls.rootBookCollection.setValue(this.user.rootBookCollection.id);
+        }
     });
   }
 

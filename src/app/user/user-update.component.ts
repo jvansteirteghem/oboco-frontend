@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { User } from './user';
 import { UserService } from './user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BookCollection } from '../book-collection/book-collection';
 
 @Component({
   selector: 'app-user-update',
@@ -17,6 +18,7 @@ export class UserUpdateComponent implements OnInit {
   userForm_submitted = false;
   userForm_loading = false;
   user: User;
+  rootBookCollections: BookCollection[];
 
   constructor(private formBuilder: FormBuilder, private userService: UserService, private route: ActivatedRoute, private router: Router) { }
 
@@ -29,13 +31,18 @@ export class UserUpdateComponent implements OnInit {
       name: {value: '', disabled: true},
       password: '',
       roleAdministrator: '',
-      roleUser: ''
+      roleUser: '',
+      rootBookCollection: ''
     });
 
     let id = +this.route.snapshot.queryParamMap.get('id');
 
-    this.userService.getUser(id)
-    .subscribe(user => {
+    forkJoin(
+      this.userService.getRootBookCollectionList(),
+      this.userService.getUser(id)
+    )
+    .subscribe(([rootBookCollectionList, user]) => {
+      this.rootBookCollections = rootBookCollectionList;
       this.user = user;
 
       this.userForm.controls.name.setValue(this.user.name);
@@ -47,8 +54,13 @@ export class UserUpdateComponent implements OnInit {
       if(this.user.roles.includes("USER")) {
         this.userForm.controls.roleUser.setValue(true);
       }
+
+      if(this.user.rootBookCollection) {
+        this.userForm.controls.rootBookCollection.setValue(this.user.rootBookCollection.id);
+      }
     });
   }
+
 
   userForm_onCancel() {
     this.router.navigate(["/user"]);
@@ -78,6 +90,11 @@ export class UserUpdateComponent implements OnInit {
 
     if(this.userForm.controls.roleUser.value == true) {
       this.user.roles.push("USER");
+    }
+    
+    if(this.userForm.controls.rootBookCollection.value != "") {
+      this.user.rootBookCollection = new BookCollection();
+      this.user.rootBookCollection.id = this.userForm.controls.rootBookCollection.value;
     }
 
     this.userService.updateUser(this.user)

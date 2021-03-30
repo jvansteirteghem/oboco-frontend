@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { User } from './user';
 import { UserPassword } from './user-password';
+import { BookCollection } from '../book-collection/book-collection';
 import { PageableList } from '../common';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -18,7 +19,7 @@ export class UserService {
   }
 
   getAuthenticatedUser(): Observable<User> {
-    return this.http.get<User>(this.url + "users/ME?graph=()");
+    return this.http.get<User>(this.url + "users/ME?graph=(rootBookCollection)");
   }
 
   updateAuthenticatedUserPassword(userPassword: UserPassword): Observable<User> {
@@ -30,7 +31,7 @@ export class UserService {
   }
 
   getUser(id: number): Observable<User> {
-    return this.http.get<User>(this.url + "users/" + id + "?graph=()");
+    return this.http.get<User>(this.url + "users/" + id + "?graph=(rootBookCollection)");
   }
 
   createUser(user: User): Observable<User> {
@@ -43,5 +44,9 @@ export class UserService {
 
   deleteUser(id: number): Observable<any> {
     return this.http.delete<User>(this.url + "users/" + id);
+  }
+
+  getRootBookCollectionList(): Observable<BookCollection[]> {
+    return this.http.get<BookCollection[]>(this.url + "users/bookCollections?graph=()");
   }
 }
