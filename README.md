@@ -42,9 +42,9 @@ the frontend of [oboco](https://gitlab.com/jeeto/oboco) (work in progress).
 ### run
 
 - start
-	- docker run -e TZ=Europe/Brussels -e BASE_URL=http://127.0.0.1:8080 -i --rm -p 9080:9080 --name oboco-frontend oboco-frontend/2.0.0
+	- docker run -e TZ=Europe/Brussels -e OBOCO_BASE_URL=http://127.0.0.1:8080 -i --rm -p 9080:9080 --name oboco-frontend oboco-frontend/2.0.0
 		- "-e TZ=Europe/Brussels": the timezone
-		- "-e BASE_URL=http://127.0.0.1:8080": the base url of oboco-backend
+		- "-e OBOCO_BASE_URL=http://127.0.0.1:8080": the base url of oboco-backend
 - stop
 	- docker stop oboco-frontend
 
@@ -60,7 +60,7 @@ you can use the latest docker image:
 ### development
 
 - push docker image
-	- docker login registry.gitlab.com -u jeeto -p <token>
+	- docker login registry.gitlab.com -u jeeto -p %TOKEN%
 	- docker build -f Dockerfile -t registry.gitlab.com/jeeto/oboco-frontend/oboco-frontend:latest .
 	- docker push registry.gitlab.com/jeeto/oboco-frontend/oboco-frontend:latest
 
